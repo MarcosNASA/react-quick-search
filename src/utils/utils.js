@@ -7,5 +7,6 @@ function debounceFn(fn, delay) {
     }, delay);
   };
 }
+const identity = (value) => value;
 
-export { debounceFn };
+export { debounceFn, identity };

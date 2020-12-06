@@ -1,175 +1,122 @@
-/* eslint-disable no-func-assign */
 import * as React from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { actionTypes, selectSearchItems, search } from "./quickSearchSlice";
+import styled from "styled-components";
 import {
-  SearchForm,
-  SearchInput,
+  QuickSearchInputBase,
+  QuickSearchDropDownListBase,
+  QuickSearchDropDownItemBase,
+  DropdownListDirections,
+  useQuickSearch,
+} from "../quick-search/QuickSearchComponents";
+import {
   SearchInputIcon,
   SearchIcon,
   SpinnerIcon,
   ErrorIcon,
-  DropdownListWrapper,
-  DropdownList,
-  DropdownItem,
-} from "../lib";
-import { mapItems } from "../../utils/api";
-import { debounceFn } from "../../utils/utils";
+  ItemInfo,
+  PlaceholderItemInfo,
+  NoItems,
+  ErrorMessage,
+} from "./quickSearch-lib";
+import { identity } from "../../utils/utils";
 
-const handleChange = (setQuery) => (event) => {
-  const newQuery = event.target.value;
-  setQuery(newQuery);
-};
-const handleFocus = (setIsFocused) => () => {
-  setIsFocused(true);
-};
-const handleBlur = (setIsFocused) => () => {
-  setTimeout(() => {
-    setIsFocused(false);
-  }, 300);
-};
+const CustomQuickSearchDropdownItem = styled(QuickSearchDropDownItemBase)`
+  display: grid;
+  grid-template-columns: 96px auto;
+  grid-template-rows: 1fr;
+`;
 
-function QuickSearchInput({
-  isIdle,
-  isPending,
-  isSuccess,
-  isError,
-  error,
-  ...props
-}) {
-  return (
-    <SearchForm>
-      <SearchInput {...props} />
-      <SearchInputIcon>
-        {(isIdle || isSuccess) && <SearchIcon />}
-        {isPending && <SpinnerIcon />}
-        {isError && <ErrorIcon title={error} />}
-      </SearchInputIcon>
-    </SearchForm>
-  );
-}
-function getQuickSearchInputProps(props) {
-  return {
-    placeholder: "Quick search...",
-    tabIndex: "0",
-    ...props,
-  };
-}
-
-function QuickSearchDropDownItem({ children, ...props }) {
-  return <DropdownItem {...props}>{children}</DropdownItem>;
-}
-function getDropdownItemProps() {}
-QuickSearchDropDownItem = React.memo(QuickSearchDropDownItem);
-
-const DropdownListDirections = {
-  LEFT: "LEFT",
-  RIGHT: "RIGHT",
-};
-function QuickSearchDropDownList({ children, ...props }) {
-  return (
-    <DropdownListWrapper>
-      <DropdownList {...props}>{children}</DropdownList>
-    </DropdownListWrapper>
-  );
-}
-function getDropdownListProps(props) {
-  return {
-    direction: DropdownListDirections.RIGHT,
-    ...props,
-  };
-}
-QuickSearchDropDownList = React.memo(QuickSearchDropDownList);
-
-function useQuickSearch({ searchItems, options }) {
-  const previousController = React.useRef();
-  const [query, setQuery] = React.useState("");
-  const [isFocused, setIsFocused] = React.useState(false);
-
-  const { value: items = [], error, status } = useSelector(selectSearchItems);
-  const dispatch = useDispatch();
-  const { debounce } = options;
-  const debouncedDispatch = React.useMemo(() => {
-    return debounceFn(dispatch, debounce ?? 0);
-  }, [dispatch, debounce]);
-  const dispatchItems = debounce ? debouncedDispatch : dispatch;
-
-  const isIdle = status === "idle";
-  const isPending = status === "pending";
-  const isSuccess = status === "success";
-  const isError = status === "failure";
-  const isDropDownVisible = query || (!isIdle && isFocused);
+function QuickSearch({ search, debounce, mappingFn = identity }) {
+  const {
+    data,
+    query,
+    isDropDownVisible,
+    setData,
+    setError,
+    setQuery,
+    setIsFocused,
+    run,
+    error,
+    isIdle,
+    isLoading,
+    isSuccess,
+    isError,
+  } = useQuickSearch(debounce);
 
   React.useEffect(() => {
-    if (previousController.current) {
-      previousController.current.abort();
-    }
+    const promise = run(search, query);
 
-    if (!query) {
-      dispatch(search({ type: actionTypes.SEARCH_EMPTY }));
+    if (!promise || !promise.then) {
       return;
     }
 
-    dispatch(
-      search({
-        type: actionTypes.SEARCH_PENDING,
-      })
-    );
-    const controller = new AbortController();
-    const { signal } = controller;
-    previousController.current = controller;
-    searchItems(query, signal)
+    promise
       .then((response) => response.json())
-      .then(
-        (data) => {
-          const queriedSearchItems = mapItems(data);
+      .then((data) => {
+        setData(mappingFn(data));
+      })
+      .catch(({ message, code }) => {
+        if (!code || code === 20) return;
 
-          dispatchItems(
-            search({
-              type: actionTypes.SEARCH_SUCCESS,
-              value: queriedSearchItems,
-            })
-          );
-        },
-        ({ message, code }) => {
-          if (code === 20) return;
+        setError(message);
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query]);
 
-          dispatch(
-            search({
-              type: actionTypes.SEARCH_FAILURE,
-              error: message,
-              value: [],
-            })
-          );
-        }
-      );
-  }, [query, searchItems, dispatch, dispatchItems]);
-
-  return {
-    items,
-    isDropDownVisible,
-    query,
-    setQuery,
-    dispatchItems,
-    setIsFocused,
-    handleChange,
-    handleFocus,
-    handleBlur,
-    getQuickSearchInputProps,
-    getDropdownListProps,
-    getDropdownItemProps,
-    error,
-    isIdle,
-    isPending,
-    isSuccess,
-    isError,
-  };
+  return (
+    <>
+      <QuickSearchInputBase setQuery={setQuery} setIsFocused={setIsFocused}>
+        <SearchInputIcon>
+          {(isIdle || isSuccess) && <SearchIcon />}
+          {isLoading && <SpinnerIcon />}
+          {isError && <ErrorIcon />}
+        </SearchInputIcon>
+      </QuickSearchInputBase>
+      {isDropDownVisible && (
+        <QuickSearchDropDownListBase direction={DropdownListDirections.LEFT}>
+          {isSuccess &&
+            (data.length > 0 ? (
+              data.map(
+                ({ isbn, title, author, subject, price, image }, index) => {
+                  return (
+                    <CustomQuickSearchDropdownItem
+                      key={isbn}
+                      data-position={index}
+                    >
+                      {isSuccess && (
+                        <ItemInfo
+                          {...{ isbn, title, author, subject, price, image }}
+                        />
+                      )}
+                    </CustomQuickSearchDropdownItem>
+                  );
+                }
+              )
+            ) : (
+              <CustomQuickSearchDropdownItem>
+                <NoItems>
+                  No items. Please, try a different search term.
+                </NoItems>
+              </CustomQuickSearchDropdownItem>
+            ))}
+          {isLoading &&
+            Array(3)
+              .fill(0)
+              .map((_, index) => {
+                return (
+                  <CustomQuickSearchDropdownItem key={index}>
+                    <PlaceholderItemInfo />
+                  </CustomQuickSearchDropdownItem>
+                );
+              })}
+          {isError && (
+            <CustomQuickSearchDropdownItem>
+              <ErrorMessage>{error}</ErrorMessage>
+            </CustomQuickSearchDropdownItem>
+          )}
+        </QuickSearchDropDownListBase>
+      )}
+    </>
+  );
 }
 
-export {
-  useQuickSearch,
-  QuickSearchInput,
-  QuickSearchDropDownList,
-  QuickSearchDropDownItem,
-  DropdownListDirections,
-};
+export { QuickSearch };
