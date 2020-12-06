@@ -7,8 +7,8 @@ import {
   DropdownListWrapper,
   DropdownList,
   DropdownItem,
-  DropdownListDirections,
-} from "./lib";
+} from "./quickSearchComponents-lib";
+import { DropdownListDirections } from "./utils";
 
 const handleChange = (setQuery) => (event) => {
   const newQuery = event.target.value;
@@ -45,16 +45,20 @@ function getQuickSearchInputProps(props) {
   };
 }
 
-function QuickSearchDropDownListBase({ children, ...props }) {
+function QuickSearchDropDownItemBase({ children, ...props }) {
   return (
     <DropdownItem {...getDropdownItemProps()} {...props}>
       {children}
     </DropdownItem>
   );
 }
-function getDropdownItemProps() {}
+function getDropdownItemProps() {
+  return {
+    tabIndex: 0,
+  };
+}
 
-function QuickSearchDropDownItemBase({ children, ...props }) {
+function QuickSearchDropDownListBase({ children, ...props }) {
   return (
     <DropdownListWrapper>
       <DropdownList {...getDropdownListProps()} {...props}>
