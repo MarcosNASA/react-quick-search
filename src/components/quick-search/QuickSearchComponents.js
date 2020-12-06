@@ -44,6 +44,7 @@ function getQuickSearchInputProps(props) {
     ...props,
   };
 }
+QuickSearchInputBase = React.memo(QuickSearchInputBase);
 
 function QuickSearchDropDownItemBase({ children, ...props }) {
   return (
@@ -57,6 +58,25 @@ function getDropdownItemProps() {
     tabIndex: 0,
   };
 }
+QuickSearchDropDownItemBase = React.memo(
+  QuickSearchDropDownItemBase,
+  (prevProps, nextProps) => {
+    const {
+      children: { props: prevChildrenProps },
+    } = prevProps;
+    const {
+      children: { props: nextChildrenProps },
+    } = nextProps;
+
+    for (const key in prevChildrenProps) {
+      if (prevChildrenProps[key] !== nextChildrenProps[key]) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+);
 
 function QuickSearchDropDownListBase({ children, ...props }) {
   return (
@@ -73,6 +93,7 @@ function getDropdownListProps(props) {
     ...props,
   };
 }
+QuickSearchDropDownListBase = React.memo(QuickSearchDropDownListBase);
 
 export {
   QuickSearchInputBase,

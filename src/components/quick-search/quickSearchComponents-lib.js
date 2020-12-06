@@ -11,11 +11,11 @@ const SearchForm = styled.form`
 const SearchInput = styled.input`
   grid-area: 1 / 1 / 2 / 3;
   background-color: ${colors.grey200};
-  padding: 12px 18px;
+  padding: 12px 40px 12px 18px;
   border: 0;
   border-radius: 2px;
   font-family: inherit;
-  &:placeholder {
+  &::placeholder {
     color: ${colors.grey400};
   }
 `;

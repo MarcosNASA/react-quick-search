@@ -50,17 +50,31 @@ function QuickSearch({ search, debounce, mappingFn = identity }) {
     }
 
     promise
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response) {
+          return;
+        }
+
+        return response.json();
+      })
       .then((data) => {
+        if (!data) {
+          return;
+        }
+
         setData(mappingFn(data));
       })
-      .catch(({ message, code }) => {
+      .catch((error) => {
+        if (!error) {
+          return;
+        }
+
+        const { message, code } = error;
         if (!code || code === 20) return;
 
         setError(message);
       });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query]);
+  }, [query, run, search, setData, setError, mappingFn]);
 
   return (
     <>

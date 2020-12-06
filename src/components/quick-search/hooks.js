@@ -72,11 +72,7 @@ function useAbortedDebouncedAsync(debounce = 0) {
       const controller = new AbortController();
       const { signal } = controller;
       previousController.current = controller;
-      return search(query, signal).catch((error) => {
-        if (error.code === 20) return;
-
-        throw error;
-      });
+      return search(query, signal);
     },
     [setPending, reset]
   );
@@ -97,9 +93,6 @@ function useAbortedDebouncedAsync(debounce = 0) {
 }
 
 function useQuickSearch(debounce) {
-  const [query, setQuery] = React.useState("");
-  const [isFocused, setIsFocused] = React.useState(false);
-
   const {
     isIdle,
     isLoading,
@@ -113,6 +106,8 @@ function useQuickSearch(debounce) {
     run,
     reset,
   } = useAbortedDebouncedAsync(debounce);
+  const [query, setQuery] = React.useState("");
+  const [isFocused, setIsFocused] = React.useState(false);
 
   const isDropDownVisible = Boolean(query) || (!isIdle && isFocused);
 
@@ -121,6 +116,7 @@ function useQuickSearch(debounce) {
     error,
     query,
     isDropDownVisible,
+    isInputFocused: isFocused,
     setData,
     setError,
     setQuery,
