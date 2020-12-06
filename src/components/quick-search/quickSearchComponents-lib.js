@@ -65,8 +65,10 @@ const DropdownItem = styled.li`
   list-style: none;
   white-space: nowrap;
   padding: 10px 10px 8px 10px;
+  border-bottom: 1px solid ${colors.grey300};
   &:last-child {
     padding: 10px;
+    border-bottom: none;
   }
 `;
 

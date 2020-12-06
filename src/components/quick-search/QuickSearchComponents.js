@@ -17,10 +17,12 @@ const handleChange = (setQuery) => (event) => {
 const handleFocus = (setIsFocused) => () => {
   setIsFocused(true);
 };
-const handleBlur = (setIsFocused) => () => {
-  setTimeout(() => {
-    setIsFocused(false);
-  }, 300);
+const handleBlur = (setIsFocused, quickSearchElement) => (e) => {
+  if (quickSearchElement.current.contains(e.relatedTarget)) {
+    e.preventDefault();
+    return;
+  }
+  setIsFocused(false);
 };
 
 const QuickSearchInputBase = React.memo(
@@ -37,8 +39,6 @@ const QuickSearchInputBase = React.memo(
         <SearchInput
           ref={ref}
           onChange={handleChange(setQuery)}
-          onFocus={handleFocus(setIsFocused)}
-          onBlur={handleBlur(setIsFocused)}
           {...getQuickSearchInputProps()}
           {...props}
         />
@@ -52,7 +52,7 @@ function getQuickSearchInputProps(props) {
     type: "text",
     placeholder: "Quick search...",
     "aria-label": "Quick Search",
-    tabIndex: "0",
+    tabIndex: 0,
     ...props,
   };
 }
@@ -108,7 +108,32 @@ function getDropdownListProps(props) {
 }
 QuickSearchDropDownListBase = React.memo(QuickSearchDropDownListBase);
 
+const QuickSearch = React.forwardRef(function QuickSearch(
+  { handleKeyPress, setIsFocused, children, ...props },
+  ref
+) {
+  return (
+    <div
+      ref={ref}
+      onKeyDown={handleKeyPress}
+      onFocus={handleFocus(setIsFocused)}
+      onBlur={handleBlur(setIsFocused, ref)}
+      {...getQuickSearchProps()}
+      {...props}
+    >
+      {children}
+    </div>
+  );
+});
+function getQuickSearchProps(props) {
+  return {
+    tabIndex: 0,
+    ...props,
+  };
+}
+
 export {
+  QuickSearch,
   QuickSearchInputBase,
   QuickSearchDropDownListBase,
   QuickSearchDropDownItemBase,

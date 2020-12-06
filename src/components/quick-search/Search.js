@@ -1,12 +1,13 @@
 import * as React from "react";
 import styled from "styled-components";
 import {
+  QuickSearch,
   QuickSearchInputBase,
   QuickSearchDropDownListBase,
   QuickSearchDropDownItemBase,
   DropdownListDirections,
   useQuickSearch,
-} from "../quick-search/QuickSearchComponents";
+} from "./QuickSearchComponents";
 import {
   SearchInputIcon,
   SearchIcon,
@@ -26,7 +27,7 @@ const CustomQuickSearchDropdownItem = styled(QuickSearchDropDownItemBase)`
   grid-template-rows: 1fr;
 `;
 
-function QuickSearch({ search, debounce, mappingFn = identity }) {
+function Search({ search, debounce, mappingFn = identity }) {
   const {
     data,
     query,
@@ -83,7 +84,11 @@ function QuickSearch({ search, debounce, mappingFn = identity }) {
   const lastLiRef = React.useRef();
 
   const handleKeyPress = (e) => {
-    if (![KEY_CODES.UP_ARROW, KEY_CODES.DOWN_ARROW].includes(e.keyCode)) {
+    if (
+      ![KEY_CODES.ESC, KEY_CODES.UP_ARROW, KEY_CODES.DOWN_ARROW].includes(
+        e.keyCode
+      )
+    ) {
       return;
     }
 
@@ -95,7 +100,9 @@ function QuickSearch({ search, debounce, mappingFn = identity }) {
         } else if (document.activeElement === firstLiRef.current) {
           inputRef.current?.focus();
         } else {
-          document.activeElement.previousSibling?.focus();
+          if (document.activeElement.tagName === "LI") {
+            document.activeElement.previousSibling?.focus();
+          }
         }
         break;
       case KEY_CODES.DOWN_ARROW:
@@ -104,8 +111,13 @@ function QuickSearch({ search, debounce, mappingFn = identity }) {
         } else if (document.activeElement === lastLiRef.current) {
           inputRef.current?.focus();
         } else {
-          document.activeElement.nextSibling?.focus();
+          if (document.activeElement.tagName === "LI") {
+            document.activeElement.nextSibling?.focus();
+          }
         }
+        break;
+      case KEY_CODES.ESC:
+        document.activeElement.blur();
         break;
       default:
         break;
@@ -113,12 +125,12 @@ function QuickSearch({ search, debounce, mappingFn = identity }) {
   };
 
   return (
-    <div ref={quickSearchRef} onKeyDown={handleKeyPress}>
-      <QuickSearchInputBase
-        ref={inputRef}
-        setQuery={setQuery}
-        setIsFocused={setIsFocused}
-      >
+    <QuickSearch
+      ref={quickSearchRef}
+      setIsFocused={setIsFocused}
+      handleKeyPress={handleKeyPress}
+    >
+      <QuickSearchInputBase ref={inputRef} setQuery={setQuery}>
         <SearchInputIcon>
           {(isIdle || isSuccess) && <SearchIcon />}
           {isLoading && <SpinnerIcon />}
@@ -177,8 +189,8 @@ function QuickSearch({ search, debounce, mappingFn = identity }) {
           )}
         </QuickSearchDropDownListBase>
       )}
-    </div>
+    </QuickSearch>
   );
 }
 
-export { QuickSearch };
+export { Search };
