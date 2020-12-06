@@ -23,43 +23,51 @@ const handleBlur = (setIsFocused) => () => {
   }, 300);
 };
 
-function QuickSearchInputBase({ setQuery, setIsFocused, children, ...props }) {
-  return (
-    <SearchForm>
-      <SearchInput
-        onChange={handleChange(setQuery)}
-        onFocus={handleFocus(setIsFocused)}
-        onBlur={handleBlur(setIsFocused)}
-        {...getQuickSearchInputProps()}
-        {...props}
-      />
-      {children}
-    </SearchForm>
-  );
-}
+const QuickSearchInputBase = React.memo(
+  React.forwardRef(function QuickSearchInputBase(
+    { setQuery, setIsFocused, children, ...props },
+    ref
+  ) {
+    const handleSubmit = (e) => {
+      e.preventDefault();
+    };
+
+    return (
+      <SearchForm onSubmit={handleSubmit}>
+        <SearchInput
+          ref={ref}
+          onChange={handleChange(setQuery)}
+          onFocus={handleFocus(setIsFocused)}
+          onBlur={handleBlur(setIsFocused)}
+          {...getQuickSearchInputProps()}
+          {...props}
+        />
+        {children}
+      </SearchForm>
+    );
+  })
+);
 function getQuickSearchInputProps(props) {
   return {
+    type: "text",
     placeholder: "Quick search...",
+    "aria-label": "Quick Search",
     tabIndex: "0",
     ...props,
   };
 }
-QuickSearchInputBase = React.memo(QuickSearchInputBase);
 
-function QuickSearchDropDownItemBase({ children, ...props }) {
-  return (
-    <DropdownItem {...getDropdownItemProps()} {...props}>
-      {children}
-    </DropdownItem>
-  );
-}
-function getDropdownItemProps() {
-  return {
-    tabIndex: 0,
-  };
-}
-QuickSearchDropDownItemBase = React.memo(
-  QuickSearchDropDownItemBase,
+const QuickSearchDropDownItemBase = React.memo(
+  React.forwardRef(function QuickSearchDropDownItemBase(
+    { children, ...props },
+    ref
+  ) {
+    return (
+      <DropdownItem ref={ref} {...getDropdownItemProps()} {...props}>
+        {children}
+      </DropdownItem>
+    );
+  }),
   (prevProps, nextProps) => {
     const {
       children: { props: prevChildrenProps },
@@ -77,6 +85,11 @@ QuickSearchDropDownItemBase = React.memo(
     return true;
   }
 );
+function getDropdownItemProps() {
+  return {
+    tabIndex: 0,
+  };
+}
 
 function QuickSearchDropDownListBase({ children, ...props }) {
   return (

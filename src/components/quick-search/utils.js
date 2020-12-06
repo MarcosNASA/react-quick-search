@@ -3,4 +3,9 @@ const DropdownListDirections = {
   RIGHT: "RIGHT",
 };
 
-export { DropdownListDirections };
+const KEY_CODES = {
+  UP_ARROW: 38,
+  DOWN_ARROW: 40,
+};
+
+export { DropdownListDirections, KEY_CODES };
