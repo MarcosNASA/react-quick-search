@@ -1,8 +1,8 @@
-import { configureStore } from '@reduxjs/toolkit';
-import counterReducer from '../features/counter/counterSlice';
+import { configureStore } from "@reduxjs/toolkit";
+import searchReducer from "../components/quick-search/quickSearchSlice";
 
 export default configureStore({
   reducer: {
-    counter: counterReducer,
+    searchItems: searchReducer,
   },
 });
