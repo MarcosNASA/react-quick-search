@@ -109,7 +109,6 @@ function useQuickSearch(debounce) {
   const [query, setQuery] = React.useState("");
   const [isFocused, setIsFocused] = React.useState(false);
 
-  // const isDropDownVisible = Boolean(query) || (!isIdle && isFocused);
   const isDropDownVisible = Boolean(query) && isFocused;
 
   return {

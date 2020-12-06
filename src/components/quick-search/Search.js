@@ -19,7 +19,6 @@ import {
   ErrorMessage,
 } from "./quickSearch-lib";
 import { identity } from "../../utils/utils";
-import { KEY_CODES } from "./utils";
 
 const CustomQuickSearchDropdownItem = styled(QuickSearchDropDownItemBase)`
   display: grid;
@@ -83,52 +82,13 @@ function Search({ search, debounce, mappingFn = identity }) {
   const firstLiRef = React.useRef();
   const lastLiRef = React.useRef();
 
-  const handleKeyPress = (e) => {
-    if (
-      ![KEY_CODES.ESC, KEY_CODES.UP_ARROW, KEY_CODES.DOWN_ARROW].includes(
-        e.keyCode
-      )
-    ) {
-      return;
-    }
-
-    e.preventDefault();
-    switch (e.keyCode) {
-      case KEY_CODES.UP_ARROW:
-        if (document.activeElement === inputRef.current) {
-          lastLiRef.current?.focus();
-        } else if (document.activeElement === firstLiRef.current) {
-          inputRef.current?.focus();
-        } else {
-          if (document.activeElement.tagName === "LI") {
-            document.activeElement.previousSibling?.focus();
-          }
-        }
-        break;
-      case KEY_CODES.DOWN_ARROW:
-        if (document.activeElement === inputRef.current) {
-          firstLiRef.current?.focus();
-        } else if (document.activeElement === lastLiRef.current) {
-          inputRef.current?.focus();
-        } else {
-          if (document.activeElement.tagName === "LI") {
-            document.activeElement.nextSibling?.focus();
-          }
-        }
-        break;
-      case KEY_CODES.ESC:
-        document.activeElement.blur();
-        break;
-      default:
-        break;
-    }
-  };
-
   return (
     <QuickSearch
       ref={quickSearchRef}
       setIsFocused={setIsFocused}
-      handleKeyPress={handleKeyPress}
+      inputRef={inputRef}
+      firstLiRef={firstLiRef}
+      lastLiRef={lastLiRef}
     >
       <QuickSearchInputBase ref={inputRef} setQuery={setQuery}>
         <SearchInputIcon>

@@ -9,6 +9,7 @@ import {
   DropdownItem,
 } from "./quickSearchComponents-lib";
 import { DropdownListDirections } from "./utils";
+import { KEY_CODES } from "./utils";
 
 const handleChange = (setQuery) => (event) => {
   const newQuery = event.target.value;
@@ -25,6 +26,69 @@ const handleBlur = (setIsFocused, quickSearchElement) => (e) => {
   setIsFocused(false);
 };
 
+const QuickSearch = React.forwardRef(function QuickSearch(
+  { setIsFocused, children, inputRef, firstLiRef, lastLiRef, ...props },
+  ref
+) {
+  const handleKeyPress = (e) => {
+    if (
+      ![KEY_CODES.ESC, KEY_CODES.UP_ARROW, KEY_CODES.DOWN_ARROW].includes(
+        e.keyCode
+      )
+    ) {
+      return;
+    }
+
+    e.preventDefault();
+    switch (e.keyCode) {
+      case KEY_CODES.UP_ARROW:
+        if (document.activeElement === inputRef.current) {
+          lastLiRef.current?.focus();
+        } else if (document.activeElement === firstLiRef.current) {
+          inputRef.current?.focus();
+        } else {
+          if (document.activeElement.tagName === "LI") {
+            document.activeElement.previousSibling?.focus();
+          }
+        }
+        break;
+      case KEY_CODES.DOWN_ARROW:
+        if (document.activeElement === inputRef.current) {
+          firstLiRef.current?.focus();
+        } else if (document.activeElement === lastLiRef.current) {
+          inputRef.current?.focus();
+        } else {
+          if (document.activeElement.tagName === "LI") {
+            document.activeElement.nextSibling?.focus();
+          }
+        }
+        break;
+      case KEY_CODES.ESC:
+        document.activeElement.blur();
+        break;
+      default:
+        break;
+    }
+  };
+  return (
+    <div
+      ref={ref}
+      onKeyDown={handleKeyPress}
+      onFocus={handleFocus(setIsFocused)}
+      onBlur={handleBlur(setIsFocused, ref)}
+      {...getQuickSearchProps({ ...props })}
+    >
+      {children}
+    </div>
+  );
+});
+function getQuickSearchProps(props) {
+  return {
+    tabIndex: 0,
+    ...props,
+  };
+}
+
 const QuickSearchInputBase = React.memo(
   React.forwardRef(function QuickSearchInputBase(
     { setQuery, setIsFocused, children, ...props },
@@ -39,8 +103,7 @@ const QuickSearchInputBase = React.memo(
         <SearchInput
           ref={ref}
           onChange={handleChange(setQuery)}
-          {...getQuickSearchInputProps()}
-          {...props}
+          {...getQuickSearchInputProps({ ...props })}
         />
         {children}
       </SearchForm>
@@ -57,13 +120,30 @@ function getQuickSearchInputProps(props) {
   };
 }
 
+function QuickSearchDropDownListBase({ children, ...props }) {
+  return (
+    <DropdownListWrapper>
+      <DropdownList {...getDropdownListProps({ ...props })}>
+        {children}
+      </DropdownList>
+    </DropdownListWrapper>
+  );
+}
+function getDropdownListProps(props) {
+  return {
+    direction: DropdownListDirections.RIGHT,
+    ...props,
+  };
+}
+QuickSearchDropDownListBase = React.memo(QuickSearchDropDownListBase);
+
 const QuickSearchDropDownItemBase = React.memo(
   React.forwardRef(function QuickSearchDropDownItemBase(
     { children, ...props },
     ref
   ) {
     return (
-      <DropdownItem ref={ref} {...getDropdownItemProps()} {...props}>
+      <DropdownItem ref={ref} {...getDropdownItemProps({ ...props })}>
         {children}
       </DropdownItem>
     );
@@ -85,47 +165,7 @@ const QuickSearchDropDownItemBase = React.memo(
     return true;
   }
 );
-function getDropdownItemProps() {
-  return {
-    tabIndex: 0,
-  };
-}
-
-function QuickSearchDropDownListBase({ children, ...props }) {
-  return (
-    <DropdownListWrapper>
-      <DropdownList {...getDropdownListProps()} {...props}>
-        {children}
-      </DropdownList>
-    </DropdownListWrapper>
-  );
-}
-function getDropdownListProps(props) {
-  return {
-    direction: DropdownListDirections.RIGHT,
-    ...props,
-  };
-}
-QuickSearchDropDownListBase = React.memo(QuickSearchDropDownListBase);
-
-const QuickSearch = React.forwardRef(function QuickSearch(
-  { handleKeyPress, setIsFocused, children, ...props },
-  ref
-) {
-  return (
-    <div
-      ref={ref}
-      onKeyDown={handleKeyPress}
-      onFocus={handleFocus(setIsFocused)}
-      onBlur={handleBlur(setIsFocused, ref)}
-      {...getQuickSearchProps()}
-      {...props}
-    >
-      {children}
-    </div>
-  );
-});
-function getQuickSearchProps(props) {
+function getDropdownItemProps(props) {
   return {
     tabIndex: 0,
     ...props,
