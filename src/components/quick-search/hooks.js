@@ -92,7 +92,7 @@ function useAbortedDebouncedAsync(debounce = 0) {
   };
 }
 
-function useQuickSearch(search, mappingFn, debounce) {
+function useQuickSearch({ search, mappingFn, debounce, isControlled }) {
   const {
     isIdle,
     isLoading,
@@ -112,6 +112,10 @@ function useQuickSearch(search, mappingFn, debounce) {
   const isDropDownVisible = Boolean(query) && isFocused;
 
   React.useEffect(() => {
+    if (isControlled) {
+      return;
+    }
+
     const promise = run(search, query);
 
     if (!promise || !promise.then) {
@@ -143,7 +147,7 @@ function useQuickSearch(search, mappingFn, debounce) {
 
         setError(message);
       });
-  }, [query, run, search, setData, setError, mappingFn]);
+  }, [isControlled, query, run, search, setData, setError, mappingFn]);
 
   return {
     data,

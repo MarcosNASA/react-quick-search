@@ -39,7 +39,7 @@ function Search({ search, debounce, mappingFn = identity, direction }) {
     isLoading,
     isSuccess,
     isError,
-  } = useQuickSearch(search, mappingFn, debounce);
+  } = useQuickSearch({ search, mappingFn, debounce, isControlled: false });
 
   const quickSearchRef = React.useRef();
   const inputRef = React.useRef();
