@@ -4,7 +4,8 @@ import { colors } from "../colors";
 const Header = styled.header`
   background-color: ${colors.grey100};
   padding: 10px;
-  display: grid;
+  display: flex;
+  flex-direction: row;
   justify-content: flex-end;
   align-items: center;
 `;

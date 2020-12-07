@@ -5,7 +5,6 @@ import {
   QuickSearchInputBase,
   QuickSearchDropDownListBase,
   QuickSearchDropDownItemBase,
-  DropdownListDirections,
   useQuickSearch,
 } from "./QuickSearchComponents";
 import {
@@ -26,7 +25,7 @@ const CustomQuickSearchDropdownItem = styled(QuickSearchDropDownItemBase)`
   grid-template-rows: 1fr;
 `;
 
-function Search({ search, debounce, mappingFn = identity }) {
+function Search({ search, debounce, mappingFn = identity, direction }) {
   const {
     data,
     query,
@@ -98,7 +97,7 @@ function Search({ search, debounce, mappingFn = identity }) {
         </SearchInputIcon>
       </QuickSearchInputBase>
       {isDropDownVisible && (
-        <QuickSearchDropDownListBase direction={DropdownListDirections.LEFT}>
+        <QuickSearchDropDownListBase direction={direction}>
           {isSuccess &&
             (data.length > 0 ? (
               data.map(
