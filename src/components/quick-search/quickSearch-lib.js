@@ -145,7 +145,7 @@ const spinnerAnimation = keyframes`
   }
 `;
 const SpinnerSVG = styled.svg`
-  animation: 2s linear infinite ${spinnerAnimation};
+  animation: 1.2s linear infinite ${spinnerAnimation};
 `;
 const Spinner = () => (
   <SpinnerSVG

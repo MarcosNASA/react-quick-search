@@ -46,7 +46,6 @@ const DropdownList = styled.ul`
   min-width: 400px;
   max-width: 500px;
   overflow-y: auto;
-  overflow-x: hidden;
   background-color: ${colors.grey200};
   top: 18px;
   left: ${({ direction }) =>
