@@ -18,7 +18,7 @@ import {
   NoItems,
   ErrorMessage,
 } from "./quickSearch-lib";
-import createStore from "./store";
+import createStore from "./quickSearch-store";
 import { Provider } from "react-redux";
 import { identity } from "../../utils/utils";
 
@@ -31,53 +31,15 @@ const CustomQuickSearchDropdownItem = styled(QuickSearchDropDownItemBase)`
 function Search({ search, debounce, mappingFn = identity, direction }) {
   const {
     data,
-    query,
     isDropDownVisible,
-    setData,
-    setError,
     setQuery,
     setIsFocused,
-    run,
     error,
     isIdle,
     isLoading,
     isSuccess,
     isError,
-  } = useQuickSearch(debounce);
-
-  React.useEffect(() => {
-    const promise = run(search, query);
-
-    if (!promise || !promise.then) {
-      return;
-    }
-
-    promise
-      .then((response) => {
-        if (!response) {
-          return;
-        }
-
-        return response.json();
-      })
-      .then((data) => {
-        if (!data) {
-          return;
-        }
-
-        setData(mappingFn(data));
-      })
-      .catch((error) => {
-        if (!error) {
-          return;
-        }
-
-        const { message, code } = error;
-        if (!code || code === 20) return;
-
-        setError(message);
-      });
-  }, [query, run, search, setData, setError, mappingFn]);
+  } = useQuickSearch(search, mappingFn, debounce);
 
   const quickSearchRef = React.useRef();
   const inputRef = React.useRef();

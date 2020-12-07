@@ -92,7 +92,7 @@ function useAbortedDebouncedAsync(debounce = 0) {
   };
 }
 
-function useQuickSearch(debounce) {
+function useQuickSearch(search, mappingFn, debounce) {
   const {
     isIdle,
     isLoading,
@@ -110,6 +110,40 @@ function useQuickSearch(debounce) {
   const [isFocused, setIsFocused] = React.useState(false);
 
   const isDropDownVisible = Boolean(query) && isFocused;
+
+  React.useEffect(() => {
+    const promise = run(search, query);
+
+    if (!promise || !promise.then) {
+      return;
+    }
+
+    promise
+      .then((response) => {
+        if (!response) {
+          return;
+        }
+
+        return response.json();
+      })
+      .then((data) => {
+        if (!data) {
+          return;
+        }
+
+        setData(mappingFn(data));
+      })
+      .catch((error) => {
+        if (!error) {
+          return;
+        }
+
+        const { message, code } = error;
+        if (!code || code === 20) return;
+
+        setError(message);
+      });
+  }, [query, run, search, setData, setError, mappingFn]);
 
   return {
     data,
