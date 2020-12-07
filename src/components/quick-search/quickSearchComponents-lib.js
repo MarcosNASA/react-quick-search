@@ -65,9 +65,13 @@ const DropdownItem = styled.li`
   white-space: nowrap;
   padding: 10px 10px 8px 10px;
   border-bottom: 1px solid ${colors.grey300};
+  transition: background-color 0.3s linear;
   &:last-child {
     padding: 10px;
     border-bottom: none;
+  }
+  &:hover {
+    background-color: ${colors.grey300};
   }
 `;
 
