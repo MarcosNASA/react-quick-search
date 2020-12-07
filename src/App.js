@@ -11,15 +11,15 @@ function App() {
       <Header>
         <Search
           debounce={200}
+          search={searchItems}
           mappingFn={mapItems}
           direction={DropdownListDirections.RIGHT}
-          search={searchItems}
         />
         <Search
           debounce={800}
+          search={searchItems}
           mappingFn={mapItems}
           direction={DropdownListDirections.LEFT}
-          search={searchItems}
         />
       </Header>
     </>
