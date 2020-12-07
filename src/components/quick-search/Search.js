@@ -1,3 +1,4 @@
+/* eslint-disable no-func-assign */
 import * as React from "react";
 import styled from "styled-components";
 import {
@@ -153,6 +154,7 @@ function Search({ search, debounce, mappingFn = identity, direction }) {
     </QuickSearch>
   );
 }
+Search = React.memo(Search);
 
 function SearchWithProviders({ children, ...props }) {
   return (
@@ -161,5 +163,6 @@ function SearchWithProviders({ children, ...props }) {
     </Provider>
   );
 }
+SearchWithProviders = React.memo(SearchWithProviders);
 
 export { SearchWithProviders as Search };
