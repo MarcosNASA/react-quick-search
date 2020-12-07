@@ -1,5 +1,4 @@
 import * as React from "react";
-
 import styled, { keyframes } from "styled-components";
 import { colors } from "../../colors";
 import placeholder from "../../assets/images/placeholder.png";
