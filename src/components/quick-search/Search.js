@@ -17,6 +17,8 @@ import {
   NoItems,
   ErrorMessage,
 } from "./quickSearch-lib";
+import createStore from "./store";
+import { Provider } from "react-redux";
 import { identity } from "../../utils/utils";
 
 const CustomQuickSearchDropdownItem = styled(QuickSearchDropDownItemBase)`
@@ -152,4 +154,12 @@ function Search({ search, debounce, mappingFn = identity, direction }) {
   );
 }
 
-export { Search };
+function SearchWithProviders({ children, ...props }) {
+  return (
+    <Provider store={createStore()}>
+      <Search {...props} />
+    </Provider>
+  );
+}
+
+export { SearchWithProviders as Search };
