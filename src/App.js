@@ -1,7 +1,7 @@
 import React from "react";
 
 import { Header } from "./components/lib";
-import { Search } from "./components/quick-search/Search";
+import { Search } from "./components/search/Search";
 import { searchItems, mapItems } from "./utils/api";
 import { DropdownListDirections } from "./components/quick-search/QuickSearchComponents";
 

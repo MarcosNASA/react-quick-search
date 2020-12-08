@@ -7,7 +7,7 @@ import {
   DropdownListWrapper,
   DropdownList,
   DropdownItem,
-} from "./quickSearchComponents-lib";
+} from "./QuickSearchComponents-ui";
 import { DropdownListDirections } from "./utils";
 import { KEY_CODES } from "./utils";
 

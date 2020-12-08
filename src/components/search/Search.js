@@ -7,7 +7,7 @@ import {
   QuickSearchDropDownListBase,
   QuickSearchDropDownItemBase,
   useQuickSearch,
-} from "./QuickSearchComponents";
+} from "../quick-search/QuickSearchComponents";
 import {
   SearchInputIcon,
   SearchIcon,
@@ -17,8 +17,8 @@ import {
   PlaceholderItemInfo,
   NoItems,
   ErrorMessage,
-} from "./quickSearch-lib";
-import createStore from "./quickSearch-store";
+} from "./Search-ui";
+import createStore from "../quick-search/quickSearch-store";
 import { Provider } from "react-redux";
 import { identity } from "../../utils/utils";
 
